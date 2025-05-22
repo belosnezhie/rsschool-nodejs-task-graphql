@@ -1,24 +1,24 @@
 import { GraphQLEnumType, GraphQLFloat, GraphQLInt, GraphQLList, GraphQLNonNull, GraphQLObjectType} from 'graphql';
 import { ResolverContext } from './context.js';
 
-export enum MemberTypeId {
+export enum MemberIdEnum {
   BASIC = 'BASIC',
   BUSINESS = 'BUSINESS',
 }
 
-export const memberTypeId = new GraphQLEnumType({
+export const MemberTypeId = new GraphQLEnumType({
   name: 'MemberTypeId',
   values: {
-    [MemberTypeId.BASIC]: { value: MemberTypeId.BASIC },
-    [MemberTypeId.BUSINESS]: { value: MemberTypeId.BUSINESS },
+    [MemberIdEnum.BASIC]: { value: MemberIdEnum.BASIC },
+    [MemberIdEnum.BUSINESS]: { value: MemberIdEnum.BUSINESS },
   }
 });
 
-export const memberType = new GraphQLObjectType({
+export const MemberType = new GraphQLObjectType({
   name: 'MemberType',
   fields: {
     id: {
-      type: new GraphQLNonNull(memberTypeId),
+      type: new GraphQLNonNull(MemberTypeId),
     },
     discount: {
       type: new GraphQLNonNull(GraphQLFloat),
