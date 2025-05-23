@@ -1,4 +1,4 @@
-import { GraphQLNonNull, GraphQLObjectType } from "graphql";
+import { GraphQLNonNull, GraphQLObjectType, GraphQLString } from "graphql";
 import { ProfileType, CreateProfileInputType, Profile, UpdateProfile, UpdateProfileInputType } from "./types/profile-types.js";
 import { ResolverContext } from "./types/context.js";
 import { UUIDType } from "./types/uuid.js";
@@ -116,5 +116,45 @@ export const rootMutation = new GraphQLObjectType({
         })
       }
     },
+
+    subscribeToUser: {
+      type: GraphQLString,
+      args: {
+        userId: { type: new GraphQLNonNull(UUIDType) },
+        authorId: { type: new GraphQLNonNull(UUIDType) },
+      },
+      resolve: async (_parent, _args: { userId: string; authorId: string }, context: ResolverContext) => {
+        await context.prisma.subscribersOnAuthors.create({
+          data: {
+            subscriberId: _args.userId,
+            authorId: _args.authorId,
+          },
+        });
+
+        return await context.prisma.user.findUnique({
+          where: {
+            id: _args.authorId,
+          },
+        });
+      }
+    },
+
+    unsubscribeFromUser: {
+      type: GraphQLString,
+      args: {
+        userId: { type: new GraphQLNonNull(UUIDType) },
+        authorId: { type: new GraphQLNonNull(UUIDType) },
+      },
+      resolve: async (_parent, _args: { userId: string; authorId: string }, context: ResolverContext) => {
+        await context.prisma.subscribersOnAuthors.delete({
+          where: {
+            subscriberId_authorId: {
+              subscriberId: _args.userId,
+              authorId: _args.authorId,
+            },
+          },
+        });
+      }
+    }
   }
 })

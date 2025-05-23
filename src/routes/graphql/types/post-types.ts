@@ -18,6 +18,7 @@ export const PostType = new GraphQLObjectType({
     id: { type: new GraphQLNonNull(UUIDType) },
     title: { type: new GraphQLNonNull(GraphQLString) },
     content: { type: new GraphQLNonNull(GraphQLString) },
+    authorId: { type: new GraphQLNonNull(UUIDType) },
   }
 })
 
