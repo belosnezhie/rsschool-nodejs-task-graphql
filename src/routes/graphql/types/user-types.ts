@@ -1,4 +1,4 @@
-import { GraphQLFloat, GraphQLInputObjectType, GraphQLInt, GraphQLList, GraphQLNonNull, GraphQLObjectType, GraphQLString } from "graphql";
+import { GraphQLFloat, GraphQLInputObjectType, GraphQLList, GraphQLNonNull, GraphQLObjectType, GraphQLString } from "graphql";
 import { UUIDType } from "./uuid.js";
 import { PostType } from "./post-types.js";
 import { ResolverContext } from "./context.js";
@@ -60,6 +60,21 @@ export const UserType: GraphQLObjectType = new GraphQLObjectType({
         });
 
         return subscriptions.map((sub) => sub.author);
+      },
+    },
+
+    subscribedToUser: {
+      type: new GraphQLList(UserType),
+      resolve: async (_parent: { id: string }, _args: unknown, context: ResolverContext) => {
+        return await context.prisma.user.findMany({
+          where: {
+            userSubscribedTo: {
+              some: {
+                authorId: _parent.id,
+              },
+            },
+          },
+        });
       },
     }
 

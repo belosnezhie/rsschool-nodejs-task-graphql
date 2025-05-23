@@ -131,6 +131,8 @@ export const rootMutation = new GraphQLObjectType({
           },
         });
 
+        // toDo: fix return value, postman error:
+        // "String cannot represent value: { id: \"50e98658-ddd3-4954-837b-eb8e2a715771\", name: \"User To Subscribe\", balance: 4.4 }"
         return await context.prisma.user.findUnique({
           where: {
             id: _args.authorId,
