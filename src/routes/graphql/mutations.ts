@@ -4,6 +4,7 @@ import { ResolverContext } from "./types/context.js";
 import { UUIDType } from "./types/uuid.js";
 import { CreatePostInputType, PostType, UpdatePost, UpdatePostInputType } from "./types/post-types.js";
 import { Post } from "@prisma/client";
+import { CreateUserInputType, User, UserType } from "./types/user-types.js";
 
 export const rootMutation = new GraphQLObjectType({
   name: 'RootMutation',
@@ -75,6 +76,42 @@ export const rootMutation = new GraphQLObjectType({
       },
       resolve: async (_parent: unknown, _args: { id: string }, context: ResolverContext) => {
         return await context.prisma.post.delete({
+          where: { id: _args.id }
+        })
+      }
+    },
+
+    createUser: {
+      type: UserType,
+      args: {
+        data: { type: new GraphQLNonNull(CreateUserInputType) }
+      },
+      resolve: async (_parent: unknown, _args: { data: User }, context: ResolverContext) => {
+        return await context.prisma.user.create({
+          data: _args.data,
+        })
+      }
+    },
+    updateUser: {
+      type: UserType,
+      args: {
+        data: { type: new GraphQLNonNull(CreateUserInputType) },
+        id: { type: new GraphQLNonNull(UUIDType)},
+      },
+      resolve: async (_parent: unknown, _args: { data: User, id: string }, context: ResolverContext) => {
+        return await context.prisma.user.update({
+          where: { id: _args.id },
+          data: _args.data,
+        })
+      }
+    },
+    deleteUser: {
+      type: UserType,
+      args: {
+        id: { type: new GraphQLNonNull(UUIDType)},
+      },
+      resolve: async (_parent: unknown, _args: { id: string }, context: ResolverContext) => {
+        return await context.prisma.user.delete({
           where: { id: _args.id }
         })
       }
