@@ -28,7 +28,7 @@ export const rootQuery = new GraphQLObjectType({
     profiles: {
       type: new GraphQLList(ProfileType),
       resolve: async (_parent: unknown, _args: unknown, context: ResolverContext) => {
-        return await context.prisma.profile.deleteMany();
+        return await context.prisma.profile.findMany();
       }
     }
   }
