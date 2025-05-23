@@ -9,6 +9,12 @@ export interface Profile {
   memberTypeId: string;
 }
 
+export interface UpdateProfile {
+  isMale: boolean;
+  yearOfBirth: number;
+  memberTypeId: string;
+}
+
 export const ProfileType = new GraphQLObjectType({
   name: 'ProfileType',
   fields: {
@@ -25,6 +31,15 @@ export const CreateProfileInputType = new GraphQLInputObjectType({
     isMale: { type: new GraphQLNonNull(GraphQLBoolean) },
     yearOfBirth: { type: new GraphQLNonNull(GraphQLInt) },
     userId: { type: new GraphQLNonNull(UUIDType) },
+    memberTypeId: { type: new GraphQLNonNull(MemberTypeId)}
+  }
+})
+
+export const UpdateProfileInputType = new GraphQLInputObjectType({
+  name: 'UpdateProfileInputType',
+  fields: {
+    isMale: { type: new GraphQLNonNull(GraphQLBoolean) },
+    yearOfBirth: { type: new GraphQLNonNull(GraphQLInt) },
     memberTypeId: { type: new GraphQLNonNull(MemberTypeId)}
   }
 })
