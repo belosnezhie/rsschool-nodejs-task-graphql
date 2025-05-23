@@ -1,6 +1,7 @@
 import { GraphQLList, GraphQLObjectType} from 'graphql';
-import { MemberType, MemberTypeId } from './types/member-type.js';
+import { MemberType, MemberTypeId } from './types/member-types.js';
 import { ResolverContext } from './types/context.js';
+import { ProfileType } from './types/profile-types.js';
 
 export const rootQuery = new GraphQLObjectType({
   name: 'RootQuery',
@@ -23,7 +24,12 @@ export const rootQuery = new GraphQLObjectType({
           }
         });
       }
-
+    },
+    profiles: {
+      type: new GraphQLList(ProfileType),
+      resolve: async (_parent: unknown, _args: unknown, context: ResolverContext) => {
+        return await context.prisma.profile.findMany();
+      }
     }
   }
 });
