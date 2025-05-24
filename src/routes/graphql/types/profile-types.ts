@@ -1,6 +1,7 @@
 import { GraphQLBoolean, GraphQLInputObjectType, GraphQLInt, GraphQLNonNull, GraphQLObjectType } from "graphql";
 import { UUIDType } from "./uuid.js";
-import { MemberTypeId } from "./member-types.js";
+import { MemberType, MemberTypeId, MemberTypeIdEnum } from "./member-types.js";
+import { ResolverContext } from "./context.js";
 
 export interface Profile {
   userId: string;
@@ -17,12 +18,22 @@ export interface UpdateProfile {
 
 export const ProfileType = new GraphQLObjectType({
   name: 'ProfileType',
-  fields: {
+  fields: () => ({
     id: { type: new GraphQLNonNull(UUIDType) },
     isMale: { type: new GraphQLNonNull(GraphQLBoolean) },
     yearOfBirth: { type: new GraphQLNonNull(GraphQLInt) },
-    memberTypeId: { type: new GraphQLNonNull(MemberTypeId)}
-  }
+    memberTypeId: { type: new GraphQLNonNull(MemberTypeId) },
+    memberType: {
+      type: new GraphQLNonNull(MemberType),
+      resolve: async (_parent: { memberTypeId: MemberTypeIdEnum }, _args: unknown, context: ResolverContext) => {
+        return await context.prisma.memberType.findUnique({
+          where: {
+            id: _parent.memberTypeId,
+           }
+        })
+      }
+    }
+  })
 })
 
 export const CreateProfileInputType = new GraphQLInputObjectType({

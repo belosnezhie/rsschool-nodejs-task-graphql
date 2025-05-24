@@ -15,7 +15,7 @@ export const rootQuery = new GraphQLObjectType({
         return await context.prisma.memberType.findMany();
       }
     },
-    memberTypeId: {
+    memberType: {
       type: MemberType,
       args: {
         id: { type: MemberTypeId }
@@ -35,7 +35,7 @@ export const rootQuery = new GraphQLObjectType({
         return await context.prisma.profile.findMany();
       }
     },
-    profileId: {
+    profile: {
       type: ProfileType,
       args: {
         id: { type: new GraphQLNonNull(UUIDType) }
@@ -55,7 +55,7 @@ export const rootQuery = new GraphQLObjectType({
         return await context.prisma.post.findMany();
       }
     },
-    postId: {
+    post: {
       type: PostType,
       args: {
         id: { type: new GraphQLNonNull(UUIDType) }
@@ -75,7 +75,7 @@ export const rootQuery = new GraphQLObjectType({
         return await context.prisma.user.findMany();
       }
     },
-    userId: {
+    user: {
       type: UserType,
       args: {
         id: { type: new GraphQLNonNull(UUIDType) }
