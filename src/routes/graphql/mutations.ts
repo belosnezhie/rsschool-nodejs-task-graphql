@@ -1,10 +1,10 @@
 import { GraphQLNonNull, GraphQLObjectType, GraphQLString } from "graphql";
-import { ProfileType, CreateProfileInputType, Profile, UpdateProfile, UpdateProfileInputType } from "./types/profile-types.js";
+import { ProfileType, CreateProfileInput, Profile, UpdateProfile, ChangeProfileInput } from "./types/profile-types.js";
 import { ResolverContext } from "./types/context.js";
 import { UUIDType } from "./types/uuid.js";
-import { CreatePostInputType, PostType, UpdatePost, UpdatePostInputType } from "./types/post-types.js";
+import { CreatePostInput, PostType, UpdatePost, ChangePostInput } from "./types/post-types.js";
 import { Post } from "@prisma/client";
-import { CreateUserInputType, User, UserType } from "./types/user-types.js";
+import { ChangeUserInput, CreateUserInput, User, UserType } from "./types/user-types.js";
 
 export const rootMutation = new GraphQLObjectType({
   name: 'RootMutation',
@@ -12,112 +12,118 @@ export const rootMutation = new GraphQLObjectType({
     createProfile: {
       type: ProfileType,
       args: {
-        data: { type: new GraphQLNonNull(CreateProfileInputType) }
+        dto: { type: new GraphQLNonNull(CreateProfileInput) }
       },
-      resolve: async (_parent: unknown, _args: { data: Profile }, context: ResolverContext) => {
+      resolve: async (_parent: unknown, _args: { dto: Profile }, context: ResolverContext) => {
         return await context.prisma.profile.create({
-          data: _args.data,
+          data: _args.dto,
         })
       }
     },
-    updateProfile: {
+    changeProfile: {
       type: ProfileType,
       args: {
-        data: { type: new GraphQLNonNull(UpdateProfileInputType) },
+        dto: { type: new GraphQLNonNull(ChangeProfileInput) },
         id: { type: new GraphQLNonNull(UUIDType)},
       },
-      resolve: async (_parent: unknown, _args: { data: UpdateProfile, id: string }, context: ResolverContext) => {
+      resolve: async (_parent: unknown, _args: { dto: UpdateProfile, id: string }, context: ResolverContext) => {
         return await context.prisma.profile.update({
           where: { id: _args.id },
-          data: _args.data,
+          data: _args.dto,
         })
       }
     },
     deleteProfile: {
-      type: ProfileType,
+      type: GraphQLString,
       args: {
         id: { type: new GraphQLNonNull(UUIDType)},
       },
       resolve: async (_parent: unknown, _args: { id: string }, context: ResolverContext) => {
-        return await context.prisma.profile.delete({
+        const profile = await context.prisma.profile.delete({
           where: { id: _args.id }
         })
+
+        return profile.id;
       }
     },
 
     createPost: {
       type: PostType,
       args: {
-        data: { type: new GraphQLNonNull(CreatePostInputType) }
+        dto: { type: new GraphQLNonNull(CreatePostInput) }
       },
-      resolve: async (_parent: unknown, _args: { data: Post }, context: ResolverContext) => {
+      resolve: async (_parent: unknown, _args: { dto: Post }, context: ResolverContext) => {
         return await context.prisma.post.create({
-          data: _args.data,
+          data: _args.dto,
         })
       }
     },
-    updatePost: {
+    changePost: {
       type: PostType,
       args: {
-        data: { type: new GraphQLNonNull(UpdatePostInputType) },
+        dto: { type: new GraphQLNonNull(ChangePostInput) },
         id: { type: new GraphQLNonNull(UUIDType)},
       },
-      resolve: async (_parent: unknown, _args: { data: UpdatePost, id: string }, context: ResolverContext) => {
+      resolve: async (_parent: unknown, _args: { dto: UpdatePost, id: string }, context: ResolverContext) => {
         return await context.prisma.post.update({
           where: { id: _args.id },
-          data: _args.data,
+          data: _args.dto,
         })
       }
     },
     deletePost: {
-      type: PostType,
+      type: GraphQLString,
       args: {
         id: { type: new GraphQLNonNull(UUIDType)},
       },
       resolve: async (_parent: unknown, _args: { id: string }, context: ResolverContext) => {
-        return await context.prisma.post.delete({
+        const post = await context.prisma.post.delete({
           where: { id: _args.id }
         })
+
+        return post.id
       }
     },
 
     createUser: {
       type: UserType,
       args: {
-        data: { type: new GraphQLNonNull(CreateUserInputType) }
+        dto: { type: new GraphQLNonNull(CreateUserInput) }
       },
-      resolve: async (_parent: unknown, _args: { data: User }, context: ResolverContext) => {
+      resolve: async (_parent: unknown, _args: { dto: User }, context: ResolverContext) => {
         return await context.prisma.user.create({
-          data: _args.data,
+          data: _args.dto,
         })
       }
     },
-    updateUser: {
+    changeUser: {
       type: UserType,
       args: {
-        data: { type: new GraphQLNonNull(CreateUserInputType) },
+        dto: { type: new GraphQLNonNull(ChangeUserInput) },
         id: { type: new GraphQLNonNull(UUIDType)},
       },
-      resolve: async (_parent: unknown, _args: { data: User, id: string }, context: ResolverContext) => {
+      resolve: async (_parent: unknown, _args: { dto: User, id: string }, context: ResolverContext) => {
         return await context.prisma.user.update({
           where: { id: _args.id },
-          data: _args.data,
+          data: _args.dto,
         })
       }
     },
     deleteUser: {
-      type: UserType,
+      type: GraphQLString,
       args: {
         id: { type: new GraphQLNonNull(UUIDType)},
       },
       resolve: async (_parent: unknown, _args: { id: string }, context: ResolverContext) => {
-        return await context.prisma.user.delete({
+        const user = await context.prisma.user.delete({
           where: { id: _args.id }
         })
+
+        return user.id;
       }
     },
 
-    subscribeToUser: {
+    subscribeTo: {
       type: GraphQLString,
       args: {
         userId: { type: new GraphQLNonNull(UUIDType) },
@@ -131,17 +137,17 @@ export const rootMutation = new GraphQLObjectType({
           },
         });
 
-        // toDo: fix return value, postman error:
-        // "String cannot represent value: { id: \"50e98658-ddd3-4954-837b-eb8e2a715771\", name: \"User To Subscribe\", balance: 4.4 }"
-        return await context.prisma.user.findUnique({
+        const user = await context.prisma.user.findUnique({
           where: {
             id: _args.authorId,
           },
         });
+
+        return user?.id;
       }
     },
 
-    unsubscribeFromUser: {
+    unsubscribeFrom: {
       type: GraphQLString,
       args: {
         userId: { type: new GraphQLNonNull(UUIDType) },
