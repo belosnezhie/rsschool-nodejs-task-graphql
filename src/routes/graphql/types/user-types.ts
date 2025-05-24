@@ -9,15 +9,6 @@ export interface User {
   balance: number;
 }
 
-
-  // id: UUID!
-  // name: String!
-  // balance: Float!
-  // profile: Profile
-  // posts: [Post!]!
-  // userSubscribedTo: [User!]!
-  // subscribedToUser: [User!]!
-
 export const UserType: GraphQLObjectType = new GraphQLObjectType({
   name: 'UserType',
   fields: () => ({
