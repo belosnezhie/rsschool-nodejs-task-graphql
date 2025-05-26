@@ -71,14 +71,16 @@ export const rootQuery = new GraphQLObjectType({
 
     users: {
       type: new GraphQLList(UserType),
-      resolve: async (_parent: unknown, _args: unknown, context: ResolverContext) => {
-        return await context.prisma.user.findMany();
-      }
+      resolve: (async (_parent: unknown, _args: { id: string }, context: ResolverContext) => {
+        const users = await context.prisma.user.findMany();
+
+        return users;
+      })
     },
     user: {
       type: UserType,
       args: {
-        id: { type: new GraphQLNonNull(UUIDType) }
+        id: { type: new GraphQLNonNull(UUIDType) },
       },
       resolve: async (_parent: unknown, _args: { id: string }, context: ResolverContext) => {
         return await context.prisma.user.findUnique({

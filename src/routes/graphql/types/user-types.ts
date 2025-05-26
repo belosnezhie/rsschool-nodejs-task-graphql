@@ -9,6 +9,11 @@ export interface User {
   balance: number;
 }
 
+export interface Subscribe {
+  subscriberId: string;
+  authorId: string;
+}
+
 export const UserType: GraphQLObjectType = new GraphQLObjectType({
   name: 'UserType',
   fields: () => ({
@@ -19,53 +24,28 @@ export const UserType: GraphQLObjectType = new GraphQLObjectType({
     profile: {
       type: ProfileType,
       resolve: async (_parent: { id: string }, _args: unknown, context: ResolverContext) => {
-        return await context.prisma.profile.findUnique({
-          where: {
-            userId: _parent.id,
-          },
-        });
+        return await context.loaders.profileLoader.load(_parent.id);
       }
     },
 
     posts: {
       type: new GraphQLList(PostType),
       resolve: async (_parent: { id: string }, _args: unknown, context: ResolverContext) => {
-        return await context.prisma.post.findMany({
-          where: {
-            authorId: _parent.id,
-          },
-        });
+        return await context.loaders.postLoader.load(_parent.id);
       }
     },
 
     userSubscribedTo: {
       type: new GraphQLList(UserType),
       resolve: async (_parent: { id: string }, _args: unknown, context: ResolverContext) => {
-        const subscriptions = await context.prisma.subscribersOnAuthors.findMany({
-          where: {
-            subscriberId: _parent.id,
-          },
-          include: {
-            author: true,
-          },
-        });
-
-        return subscriptions.map((sub) => sub.author);
+        return await context.loaders.userSubscribedToLoader.load(_parent.id);
       },
     },
 
     subscribedToUser: {
       type: new GraphQLList(UserType),
       resolve: async (_parent: { id: string }, _args: unknown, context: ResolverContext) => {
-        return await context.prisma.user.findMany({
-          where: {
-            userSubscribedTo: {
-              some: {
-                authorId: _parent.id,
-              },
-            },
-          },
-        });
+        return await context.loaders.subscribedToUserLoader.load(_parent.id);
       },
     }
 
